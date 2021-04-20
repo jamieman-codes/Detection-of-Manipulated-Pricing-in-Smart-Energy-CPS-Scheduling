@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "detection-of-manipulated-pricing-in-smart-energy-cps-scheduling"
+version = "1.0.0"
+description = "Lab2 for COMP3217"
+authors = ["Jamie Stevens"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+scikit-learn = "^0.24.1"
+pandas = "^1.2.4"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
