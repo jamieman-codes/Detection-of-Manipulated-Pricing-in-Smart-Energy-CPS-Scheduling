@@ -34,9 +34,11 @@ for user in users:
             totalVars += 1
     userVars.append(totalVars)
 
-for rowPos in range(0, len(abnormalCurves)):
+#For each curve
+for rowPos in range(0, len(abnormalCurves)): 
     row = abnormalCurves.iloc[rowPos]
     total = {0:0, 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0, 11:0, 12:0, 13:0, 14:0, 15:0, 16:0, 17:0, 18:0, 19:0, 20:0, 21:0, 22:0, 23:0}
+    #For each user
     for userPos in range(0, len(users)):
         c = [] #coefficients of the linear objective function to be minimized.
         a = [] #The equality constraint matrix.
@@ -44,18 +46,20 @@ for rowPos in range(0, len(abnormalCurves)):
         bounds = [] #Array of bounds
         hours = [] #Maps to result array
         a_index = 0
+        #For each task
         for index, task in users[userPos].iterrows(): #Loop over each users task
             a_row = []
-            for i in range(0, a_index):
+            for i in range(0, a_index): #Every varible that has already been defined
                 a_row.append(0)
-            for x in range(task["Ready Time"], task["Deadline"] + 1):
-                c.append(row[x]) #Get price
+            for x in range(task["Ready Time"], task["Deadline"] + 1): #Varibles that are being defined
+                c.append(row[x]) #Set price
                 a_index += 1
                 a_row.append(1)
                 bounds.append((0,1))
                 hours.append(x)
-            for i in range(a_index, userVars[userPos]):
+            for i in range(a_index, userVars[userPos]): #Varibles that still need to be defined
                 a_row.append(0)
+
             a.append(a_row)
             b.append(task["Energy Demand"])
 
