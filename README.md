@@ -6,7 +6,7 @@ First install dependencies with:
 poetry install
 ```
 
-Run the classifer with:
+A file can then be run with:
 ```
-poetry run python classifer.py
+poetry run python FILNAME
 ```
