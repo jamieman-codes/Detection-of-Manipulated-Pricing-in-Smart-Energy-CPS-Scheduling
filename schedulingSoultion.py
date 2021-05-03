@@ -34,37 +34,47 @@ for user in users:
             totalVars += 1
     userVars.append(totalVars)
 
-#For each curve
+#Compute the equality constraint matricies, vectors and bounds for each user.
+#These will remain the same for every calculation
+As = [] #Contains all users 'a' equality constraint matricies.
+Bs = [] #Contains all users 'b' equality constraint vectors.
+Boundss = [] #Contains all users bounds
+for userPos in range(0, len(users)):
+    a = [] #The equality constraint matrix.
+    b = [] #The equality constraint vector
+    a_index = 0
+    bounds = [] #Array of bounds
+    for index, task in users[userPos].iterrows(): #Loop over each users task
+        a_row = []
+        for i in range(0, a_index): #Every varible that has already been defined
+            a_row.append(0)
+        for x in range(task["Ready Time"], task["Deadline"] + 1):
+            a_index += 1
+            a_row.append(1)
+            bounds.append((0,1))
+        for i in range(a_index, userVars[userPos]): #Varibles that still need to be defined
+            a_row.append(0)
+        a.append(a_row)
+        b.append(task["Energy Demand"])
+
+    As.append(a)
+    Bs.append(b)
+    Boundss.append(bounds)
+
 for rowPos in range(0, len(abnormalCurves)): 
     row = abnormalCurves.iloc[rowPos]
     total = {0:0, 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0, 11:0, 12:0, 13:0, 14:0, 15:0, 16:0, 17:0, 18:0, 19:0, 20:0, 21:0, 22:0, 23:0}
-    #For each user
+    
     for userPos in range(0, len(users)):
         c = [] #coefficients of the linear objective function to be minimized.
-        a = [] #The equality constraint matrix.
-        b = [] #The equality constraint vector
-        bounds = [] #Array of bounds
         hours = [] #Maps to result array
-        a_index = 0
-        #For each task
-        for index, task in users[userPos].iterrows(): #Loop over each users task
-            a_row = []
-            for i in range(0, a_index): #Every varible that has already been defined
-                a_row.append(0)
-            for x in range(task["Ready Time"], task["Deadline"] + 1): #Varibles that are being defined
+        for index, task in users[userPos].iterrows(): 
+            for x in range(task["Ready Time"], task["Deadline"] + 1): 
                 c.append(row[x]) #Set price
-                a_index += 1
-                a_row.append(1)
-                bounds.append((0,1))
                 hours.append(x)
-            for i in range(a_index, userVars[userPos]): #Varibles that still need to be defined
-                a_row.append(0)
-
-            a.append(a_row)
-            b.append(task["Energy Demand"])
 
         #Work out minimisation for user        
-        res = linprog(c, A_eq=a, b_eq=b, bounds=bounds)
+        res = linprog(c, A_eq=As[userPos], b_eq=Bs[userPos], bounds=Boundss[userPos])
         resX  = res.x
         #Add to total
         for x in range(0, len(hours)):
@@ -79,9 +89,3 @@ for rowPos in range(0, len(abnormalCurves)):
     plt.xticks([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23])
     plt.savefig("graphs/" + str(rowPos+1) + ".png")
     plt.clf()
-
-
-
-
-# Workflow: Loop over each abnornal curve -> loop over each user -> Loop over each users task -> Loop over range of ready time to deadline -> 
-# Create C array using curve -> Create A array using totalVars -> Create array of bounds (all will be 0<=x<=1) ->Create graph
